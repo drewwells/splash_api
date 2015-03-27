@@ -1,0 +1,3 @@
+test:
+  post:
+    - goxc -tasks='xc archive' -d $CIRCLE_ARTIFACTS -n splash -wd cmd/splash
