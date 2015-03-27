@@ -3,14 +3,14 @@ SPLASH
 
 Downlaods images from [Splashbase](http://www.splashbase.co/)!
 
-Images are stored in `$HOME/.splash_api`. The latest images from splashbase and stored in this folder. Set your OS to randomly retrieve images from this folder to make user of this library.
+Images are stored in `$HOME/.splash_api`. Run this periodically to download the latest images. Set your OS to randomly retrieve images from `$HOME/.splash_api` and you're good to go.
 
 ### Usage Instructions
 
     go get github.com/drewwells/splash_api/cmd/splash
     splash
 
-To check, but not download new images
+To check for new images, but not download them.
 
     splash -check
 
