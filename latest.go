@@ -11,8 +11,8 @@ import (
 	"path/filepath"
 )
 
-const LATEST = "http://www.splashbase.co/api/v1/images/latest"
-const RANDOM = "http://www.splashbase.co/api/v1/images/random"
+const LATEST = "http://www.splashbase.co/api/v1/images/latest?images_only=true"
+const RANDOM = "http://www.splashbase.co/api/v1/images/random?images_only=true"
 
 var (
 	ErrResolvePath = errors.New("Failed to resolve path")
