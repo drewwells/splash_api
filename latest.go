@@ -17,6 +17,7 @@ const RANDOM = "http://www.splashbase.co/api/v1/images/random?images_only=true"
 var (
 	ErrResolvePath = errors.New("Failed to resolve path")
 	ErrDir         = errors.New("Slash API directory could not be created")
+	ErrNoPath      = errors.New("No resolvable path to image")
 )
 
 var setupDir func() (string, error)
@@ -88,7 +89,6 @@ func (i *Image) Fetch(params Params) error {
 	if !os.IsNotExist(err) {
 		return os.ErrExist
 	}
-
 	log.Printf("New image from %s: %s\n", i.Site, i.Path)
 	if !params.Fetch {
 		return nil
@@ -98,9 +98,16 @@ func (i *Image) Fetch(params Params) error {
 	if err != nil {
 		return err
 	}
-
+	url := i.Large
+	if len(url) == 0 {
+		url = i.URL
+	}
+	if len(url) == 0 {
+		return ErrNoPath
+	}
 	resp, err := http.Get(i.Large)
 	if err != nil {
+		log.Printf("% #v\n", i)
 		return err
 	}
 

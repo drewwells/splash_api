@@ -49,3 +49,19 @@ func TestFetch_shortpath(t *testing.T) {
 		log.Fatal(err)
 	}
 }
+
+func TestFetch_nopath(t *testing.T) {
+	p := Params{
+		Fetch: false,
+	}
+	i := Image{
+		ID: 2018, URL: "", Large: "",
+		Site: "unsplash",
+	}
+
+	err := i.Fetch(p)
+
+	if err != ErrResolvePath {
+		log.Fatal(err)
+	}
+}
