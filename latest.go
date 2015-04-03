@@ -84,16 +84,16 @@ func (i *Image) Fetch(params Params) error {
 	if err != nil {
 		return err
 	}
+	if !params.Fetch {
+		return nil
+	}
+	log.Println("Fetching...")
 	i.Path = filepath.Join(params.Dir, path)
 	_, err = os.Stat(i.Path)
 	if !os.IsNotExist(err) {
 		return os.ErrExist
 	}
 	log.Printf("New image from %s: %s\n", i.Site, i.Path)
-	if !params.Fetch {
-		return nil
-	}
-	log.Println("Fetching...")
 	file, err := os.Create(i.Path)
 	if err != nil {
 		return err
@@ -141,12 +141,10 @@ type Params struct {
 
 func get(params Params) (*Images, error) {
 	resp, err := http.Get(params.Endpoint)
-
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
-
 	var imgs Images
 	dec := json.NewDecoder(resp.Body)
 	switch params.Type {
@@ -199,8 +197,6 @@ func Get(params Params) error {
 		err := img.Fetch(params)
 		if os.IsExist(err) {
 			log.Println("File already exists", img.Path)
-		} else if err != nil {
-			return err
 		}
 	}
 	return nil
