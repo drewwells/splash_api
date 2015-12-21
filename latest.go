@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/user"
 	"path/filepath"
+	"sync"
 )
 
 const LATEST = "http://www.splashbase.co/api/v1/images/latest?images_only=true"
@@ -87,8 +88,8 @@ func (i *Image) Fetch(params Params) error {
 	if !params.Fetch {
 		return nil
 	}
-	log.Println("Fetching...")
 	i.Path = filepath.Join(params.Dir, path)
+	log.Println("Fetching...", i.Path)
 	_, err = os.Stat(i.Path)
 	if !os.IsNotExist(err) {
 		return os.ErrExist
@@ -193,11 +194,17 @@ func Get(params Params) error {
 		return err
 	}
 
+	var wg sync.WaitGroup
 	for _, img := range imgs.Images {
-		err := img.Fetch(params)
-		if os.IsExist(err) {
-			log.Println("File already exists", img.Path)
-		}
+		wg.Add(1)
+		go func(img Image) {
+			defer wg.Done()
+			err := img.Fetch(params)
+			if os.IsExist(err) {
+				log.Println("File already exists", img.Path)
+			}
+		}(img)
 	}
+	wg.Wait()
 	return nil
 }
