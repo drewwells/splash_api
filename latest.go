@@ -89,7 +89,6 @@ func (i *Image) Fetch(params Params) error {
 		return nil
 	}
 	i.Path = filepath.Join(params.Dir, path)
-	log.Println("Fetching...", i.Path)
 	_, err = os.Stat(i.Path)
 	if !os.IsNotExist(err) {
 		return os.ErrExist
@@ -194,17 +193,29 @@ func Get(params Params) error {
 		return err
 	}
 
+	var mu sync.Mutex
+	var success int
 	var wg sync.WaitGroup
 	for _, img := range imgs.Images {
 		wg.Add(1)
 		go func(img Image) {
 			defer wg.Done()
 			err := img.Fetch(params)
-			if os.IsExist(err) {
-				log.Println("File already exists", img.Path)
+			if err == nil {
+				mu.Lock()
+				success++
+				mu.Unlock()
+			}
+			if err != nil && !os.IsExist(err) {
+				log.Printf("error fetching image %s: %s\n", img.Path, err)
 			}
 		}(img)
 	}
 	wg.Wait()
+
+	if success == 0 {
+		log.Println("No new images found.")
+	}
+
 	return nil
 }
